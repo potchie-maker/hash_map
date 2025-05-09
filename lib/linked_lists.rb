@@ -1,6 +1,6 @@
-require_relative 'hash_map'
-
 class LinkedList
+  attr_accessor :head, :tail
+
   def initialize
     @head = nil
     @tail = nil
@@ -38,11 +38,11 @@ class LinkedList
     size
   end
 
-  def head
+  def head_value
     @head.value
   end
 
-  def tail
+  def tail_value
     @tail.value
   end
 
@@ -80,10 +80,10 @@ class LinkedList
     popped
   end
 
-  def contains?(value)
+  def contains?(key)
     cur = @head
     while cur
-      if cur.value == value
+      if cur.key == key
         return true
       end
       cur = cur.next_node
@@ -91,14 +91,24 @@ class LinkedList
     false
   end
 
-  def find(value)
+  def find_index(key)
     return nil if @head.nil?
     index = 0
     cur = @head
     while cur
-      return index if cur.value == value
+      return index if cur.key == key
       cur = cur.next_node
       index += 1
+    end
+    nil
+  end
+
+  def find_node(key)
+    return nil if @head.nil?
+    cur = @head
+    while cur
+      return cur if cur.key == key
+      cur = cur.next_node
     end
     nil
   end
@@ -143,6 +153,62 @@ class LinkedList
     removed = cur.next_node
     cur.next_node = cur.next_node.next_node
     removed
+  end
+
+  def delete(key)
+    return nil unless self.contains?(key)
+
+    if @head.key == key
+      removed = @head
+      @head = @head.next_node
+      @tail = nil if @head.nil?
+      return removed
+    end
+
+    prev = @head
+    cur = @head.next_node
+    while cur
+      if cur.key == key
+        removed = cur
+        prev.next_node = cur.next_node
+        @tail = prev if cur == @tail
+        return removed
+      end
+      prev = cur
+      cur = cur.next_node
+    end
+    nil
+  end
+
+  def list_keys
+    list = []
+    cur = @head
+    while cur
+      list << cur.key
+      cur = cur.next_node
+    end
+    list
+  end
+
+  def list_values
+    list = []
+    cur = @head
+    while cur
+      list << cur.value
+      cur = cur.next_node
+    end
+    list
+  end
+
+  def list_pairs
+    return [] if @head.nil?
+    list = []
+    cur = @head
+    while cur
+      list << [cur.key, cur.value]
+      cur = cur.next_node
+    end
+    list
   end
 
   def to_s

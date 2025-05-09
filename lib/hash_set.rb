@@ -1,6 +1,6 @@
 require_relative 'linked_lists'
 
-class HashMap
+class HashSet
   attr_accessor :buckets
   attr_reader :capacity
   
@@ -20,22 +20,18 @@ class HashMap
     hash_code
   end
 
-  def capacity
-    @capacity
-  end
-
   def rehash
     return unless self.length >= (@capacity * @load_factor)
     old_entries = self.entries
     @capacity *= 2
     @buckets = Array.new(@capacity) { LinkedList.new }
 
-    old_entries.each do |key, value|
-      self.set(key, value)
+    old_entries.each do |key|
+      self.set(key)
     end
   end
 
-  def set(key, value)
+  def set(key)
     self.rehash
     hash_code = hash(key)
     index = hash_code % @capacity
@@ -43,19 +39,11 @@ class HashMap
     bucket = @buckets[index]
     existing_node = bucket.find_node(key)
     if existing_node
-      existing_node.value = value
+      return
     else
-      bucket.append(key, value)
+      bucket.append(key, nil)
       @size += 1
     end
-  end
-
-  def get(key)
-    hash_code = hash(key)
-    index = hash_code % @capacity
-    raise IndexError if index.negative? || index >= @buckets.length
-    node = @buckets[index].find_node(key)
-    node&.value
   end
 
   def has?(key)
@@ -98,22 +86,6 @@ class HashMap
     list = []
     @buckets.each do |bucket|
       list.concat(bucket.list_keys)
-    end
-    list
-  end
-
-  def values
-    list = []
-    @buckets.each do |bucket|
-      list.concat(bucket.list_values)
-    end
-    list
-  end
-
-  def entries
-    list = []
-    @buckets.each do |bucket|
-      list.concat(bucket.list_pairs)
     end
     list
   end
